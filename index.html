@@ -43,6 +43,8 @@
             align-items: center;
             text-transform: uppercase;
             letter-spacing: 2px;
+            margin-bottom: 2rem; /* Add spacing for views */
+            pointer-events: auto;
         }
 
         h1 {
@@ -50,6 +52,7 @@
             margin: 0;
             font-weight: bold;
             text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            cursor: pointer;
         }
 
         nav a {
@@ -57,8 +60,8 @@
             text-decoration: none;
             margin-left: 2rem;
             font-size: 0.9rem;
-            pointer-events: auto; /* Re-enable clicks for links */
             transition: color 0.3s;
+            cursor: pointer;
         }
 
         nav a:hover {
@@ -66,6 +69,16 @@
             text-shadow: 0 0 5px #0ff;
         }
 
+        /* View Management */
+        .view-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Hero / Home Styles */
         .hero {
             max-width: 600px;
         }
@@ -86,11 +99,42 @@
             border-left: 2px solid #0ff;
         }
 
+        /* Mining Page Styles */
+        .mining-links {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+            pointer-events: auto;
+        }
+        
+        .mining-links li {
+            margin-bottom: 1rem;
+        }
+
+        .mining-links a {
+            font-size: 1.5rem;
+            color: #0ff;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s, text-shadow 0.2s;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            width: 100%;
+            max-width: 400px;
+            padding: 0.5rem 0;
+        }
+
+        .mining-links a:hover {
+            transform: translateX(20px);
+            text-shadow: 0 0 10px #0ff;
+            border-bottom-color: #0ff;
+        }
+
         .status-bar {
             display: flex;
             gap: 2rem;
             font-size: 0.8rem;
             color: #666;
+            margin-top: auto;
         }
 
         .status-item span {
@@ -106,18 +150,46 @@
     <!-- UI Overlay -->
     <div id="ui-layer">
         <header>
-            <h1>AsteroidWorks.Inc</h1>
+            <h1 onclick="switchView('home-view')">AsteroidWorks.Inc</h1>
             <nav>
-                <a href="#">Mining</a>
-                <a href="#">Logistics</a>
+                <a onclick="switchView('mining-view')">Mining</a>
+                <a href="#">Revenue</a>
+                <a href="#">Profit</a>
                 <a href="#">Careers</a>
-                <a href="#">Contact</a>
+                <a onclick="switchView('contact-view')">Contact</a>
             </nav>
         </header>
 
-        <div class="hero">
-            <h2>BUILDING<br>THE BELT.</h2>
-            <p>From raw ore extraction to orbital infrastructure, AsteroidWorks provides the foundation for humanity's next giant leap.</p>
+        <!-- HOME VIEW -->
+        <div id="home-view" class="view-section">
+            <div class="hero">
+                <h2>BUILDING<br>THE BELT.</h2>
+                <p>From raw ore extraction to orbital infrastructure, AsteroidWorks provides the foundation for humanity's next giant leap.</p>
+            </div>
+        </div>
+
+        <!-- MINING VIEW (Hidden by default) -->
+        <div id="mining-view" class="view-section" style="display: none;">
+            <div class="hero">
+                <h2>MINING<br>OPERATIONS.</h2>
+                <ul class="mining-links">
+                    <li><a href="#">> SECTOR 7 DEEP CORE</a></li>
+                    <li><a href="#">> SURFACE STRIP LOGISTICS</a></li>
+                    <li><a href="#">> DRONE TELEMETRY</a></li>
+                    <li><a href="#">> MINERAL YIELD ANALYSIS</a></li>
+                    <li><a href="#">> HAZARD REPORTS</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CONTACT VIEW (Hidden by default) -->
+        <div id="contact-view" class="view-section" style="display: none;">
+            <div class="hero">
+                <h2>SECURE<br>CHANNELS.</h2>
+                <ul class="mining-links">
+                    <li><a href="mailto:halleybearyoung@gmail.com">> halleybearyoung@gmail.com</a></li>
+                </ul>
+            </div>
         </div>
 
         <div class="status-bar">
@@ -130,6 +202,19 @@
     <!-- Three.js Logic -->
     <script type="module">
         import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+        // --- Navigation Logic ---
+        window.switchView = function(viewId) {
+            // Hide all view sections
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.style.display = 'none';
+            });
+            // Show the selected one
+            const target = document.getElementById(viewId);
+            if(target) {
+                target.style.display = 'flex'; // Restore flex display
+            }
+        };
 
         // 1. Scene Setup
         const scene = new THREE.Scene();
