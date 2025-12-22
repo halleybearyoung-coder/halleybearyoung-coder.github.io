@@ -129,6 +129,8 @@
             border-bottom-color: #0ff;
         }
 
+        /* REMOVED: All Tycoon Game Styles */
+
         .status-bar {
             display: flex;
             gap: 2rem;
@@ -154,8 +156,7 @@
             <nav>
                 <a onclick="switchView('mining-view')">Mining</a>
                 <a href="#">Revenue</a>
-                <a href="#">Profit</a>
-                <a href="#">Careers</a>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdJGkSP0lKdVWtbc_66BIyzN4WvCJ8THGFT-JEbB2hsVdmBcQ/viewform?usp=preview" target="_blank">Error Reports</a>
                 <a onclick="switchView('contact-view')">Contact</a>
             </nav>
         </header>
@@ -177,10 +178,11 @@
                     <li><a href="https://halleybearyoung-coder.github.io/Asteroid.Works.AI/">> ASTEROIDS OF AI</a></li>
                     <li><a href="#">> DRONE TELEMETRY</a></li>
                     <li><a href="#">> MINERAL YIELD ANALYSIS</a></li>
-                    <li><a href="#">> HAZARD REPORTS</a></li>
                 </ul>
             </div>
         </div>
+
+        <!-- REMOVED: Tycoon View Section -->
 
         <!-- CONTACT VIEW (Hidden by default) -->
         <div id="contact-view" class="view-section" style="display: none;">
@@ -202,6 +204,8 @@
     <!-- Three.js Logic -->
     <script type="module">
         import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+        // REMOVED: All Game State and Game Logic functions
 
         // --- Navigation Logic ---
         window.switchView = function(viewId) {
@@ -241,30 +245,146 @@
         sunLight.position.set(-5, 3, 5);
         scene.add(sunLight);
 
+        // --- Helper: Create Procedural Rock Texture ---
+        function createRockTexture() {
+            const size = 512;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // 1. Base Noise
+            ctx.fillStyle = '#555'; // Base grey
+            ctx.fillRect(0, 0, size, size);
+
+            // 2. Grainy Noise (Sand/Dust)
+            for (let i = 0; i < 100000; i++) {
+                const x = Math.random() * size;
+                const y = Math.random() * size;
+                const shade = Math.random() > 0.5 ? '#777' : '#333';
+                ctx.fillStyle = shade;
+                ctx.globalAlpha = 0.15;
+                ctx.fillRect(x, y, 2, 2);
+            }
+            
+            // 3. Larger Splotches (Mineral deposits)
+            for (let i = 0; i < 200; i++) {
+                const x = Math.random() * size;
+                const y = Math.random() * size;
+                const r = Math.random() * 20;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = Math.random() > 0.5 ? '#000' : '#fff';
+                ctx.globalAlpha = 0.05;
+                ctx.fill();
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            return texture;
+        }
+
+        const rockTexture = createRockTexture();
+
+
         // 3. The Asteroid (Procedural)
-        const geometry = new THREE.DodecahedronGeometry(2, 2); // Detail level 2
+        // Switched to high-res SphereGeometry (256 segments) for maximum smoothness
+        const geometry = new THREE.SphereGeometry(2, 256, 256); 
         
-        // Displace vertices to make it look like a rock
         const positionAttribute = geometry.attributes.position;
         const vertex = new THREE.Vector3();
         
+        // Define random impact craters
+        const craters = [];
+        
+        // 1. Large "Hero" Craters
+        for(let k = 0; k < 5; k++) {
+            const center = new THREE.Vector3(
+                (Math.random() - 0.5) * 2, 
+                (Math.random() - 0.5) * 2, 
+                (Math.random() - 0.5) * 2
+            ).normalize();
+            craters.push({
+                center: center,
+                radius: 0.3 + Math.random() * 0.2, 
+                depth: 0.1 + Math.random() * 0.1,
+                hasRim: Math.random() > 0.5 // 50% chance of a rim
+            });
+        }
+
+        // 2. Small "Micro" Craters (The requested bunch)
+        for(let k = 0; k < 80; k++) {
+            const center = new THREE.Vector3(
+                (Math.random() - 0.5) * 2, 
+                (Math.random() - 0.5) * 2, 
+                (Math.random() - 0.5) * 2
+            ).normalize();
+            craters.push({
+                center: center,
+                radius: 0.05 + Math.random() * 0.1, // Small but spans enough vertices
+                depth: 0.02 + Math.random() * 0.03,  // Visible indent
+                hasRim: Math.random() > 0.7 // 30% chance of a rim
+            });
+        }
+
         for (let i = 0; i < positionAttribute.count; i++) {
             vertex.fromBufferAttribute(positionAttribute, i);
-            // Random noise per vertex
-            const distortion = 0.2; // Strength of rockiness
-            vertex.x += (Math.random() - 0.5) * distortion;
-            vertex.y += (Math.random() - 0.5) * distortion;
-            vertex.z += (Math.random() - 0.5) * distortion;
+            
+            const v = vertex.clone().normalize();
+            
+            // 1. Shape Noise (Low Frequency)
+            let distortion = 0;
+            distortion += Math.sin(v.x * 2.1 + 0.5) * 0.5; 
+            distortion += Math.cos(v.y * 1.8 + 1.2) * 0.5;
+            distortion += Math.sin(v.z * 2.5 + 2.0) * 0.5;
+
+            // 2. Surface Noise (High Frequency)
+            // Lowered frequency and amplitude to remove "jagged" look
+            distortion += Math.sin(v.x * 4) * 0.03;
+            distortion += Math.cos(v.y * 4) * 0.03;
+            distortion += Math.sin(v.z * 4) * 0.03;
+
+            // 3. Apply Craters
+            for (let k = 0; k < craters.length; k++) {
+                const crater = craters[k];
+                const dist = v.distanceTo(crater.center); // Distance on sphere surface
+
+                if (dist < crater.radius) {
+                    // Normalized distance from center (0 to 1)
+                    const x = dist / crater.radius;
+                    
+                    // Create a smooth bowl shape using Cosine
+                    // At center (x=0), val=1. At edge (x=1), val=0.
+                    const cavity = Math.pow(Math.cos(x * Math.PI * 0.5), 2.5); 
+                    
+                    // Dig the hole
+                    distortion -= cavity * crater.depth * 3.5;
+
+                    // Conditional Rim: Only add the "lump" if this crater has one
+                    if (crater.hasRim) {
+                        const rim = Math.sin(x * Math.PI) * crater.depth * 2.0;
+                        if (rim > 0) distortion += rim;
+                    }
+                }
+            }
+            
+            // Apply distortion to radius
+            const radius = 2.0 + distortion * 0.6;
+            
+            vertex.normalize().multiplyScalar(radius);
+            
             positionAttribute.setXYZ(i, vertex.x, vertex.y, vertex.z);
         }
         
-        geometry.computeVertexNormals(); // Recompute lighting
+        geometry.computeVertexNormals();
 
         const material = new THREE.MeshStandardMaterial({
-            color: 0x333333,
-            roughness: 0.8,
-            metalness: 0.4,
-            flatShading: true // Gives it that low-poly tech look
+            color: 0x888888,     // Lighter base to let texture show
+            map: rockTexture,    // Apply the texture
+            bumpMap: rockTexture,// Use texture for bumpiness
+            bumpScale: 0.15,     // Strength of the surface grit
+            roughness: 0.9,
+            metalness: 0.2,
+            flatShading: false
         });
 
         const asteroid = new THREE.Mesh(geometry, material);
@@ -295,6 +415,7 @@
         let mouseY = 0;
         let targetX = 0;
         let targetY = 0;
+        // REMOVED: Raycaster Logic
 
         const windowHalfX = window.innerWidth / 2;
         const windowHalfY = window.innerHeight / 2;
