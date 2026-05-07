@@ -116,6 +116,25 @@
             padding: 0;
             margin: 2rem 0;
             pointer-events: auto;
+            max-height: 55vh; /* Restricts height so it doesn't fall off screen */
+            overflow-y: auto; /* Enables vertical scrolling */
+            padding-right: 15px; /* Adds space so the scrollbar doesn't cover text */
+        }
+
+        /* Custom Sci-Fi Scrollbar for the links */
+        .mining-links::-webkit-scrollbar {
+            width: 8px;
+        }
+        .mining-links::-webkit-scrollbar-track {
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        .mining-links::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        .mining-links::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 255, 0.8);
         }
         
         .mining-links li {
