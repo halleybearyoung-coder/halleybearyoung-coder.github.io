@@ -215,6 +215,78 @@
             font-weight: bold;
             letter-spacing: 2px;
         }
+
+        /* --- NEW: CUSTOM CURSOR --- */
+        body, a, h1, .modal-close { cursor: none; }
+        
+        #custom-cursor {
+            position: fixed;
+            top: 0; left: 0;
+            width: 20px; height: 20px;
+            border: 2px solid #0ff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 10000;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+        
+        #custom-cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 4px; height: 4px;
+            background: #0ff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        #custom-cursor.hovering {
+            width: 35px; height: 35px;
+            background-color: rgba(0, 255, 255, 0.1);
+            border-style: dashed;
+            animation: spinCursor 4s linear infinite;
+        }
+        
+        @keyframes spinCursor { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* --- NEW: ARCHIVE MODAL --- */
+        #archive-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 20, 30, 0.95);
+            border: 1px solid #0ff;
+            color: #0ff;
+            padding: 2rem;
+            width: 80%; max-width: 600px;
+            z-index: 9999;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #0ff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .modal-close { color: #ff5555; }
+        .modal-close:hover { text-shadow: 0 0 10px #ff5555; }
+        
+        .glitch-text { display: inline-block; animation: glitch 0.2s linear infinite; color: #ff5555; }
+        @keyframes glitch { 
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 1px) }
+            40% { transform: translate(-1px, -1px) }
+            60% { transform: translate(2px, 1px) }
+            80% { transform: translate(1px, -1px) }
+            100% { transform: translate(0) }
+        }
     </style>
 </head>
 <body>
@@ -222,6 +294,18 @@
     <!-- BOOT SEQUENCE OVERLAY -->
     <div id="boot-screen">
         <div id="boot-text"></div>
+    </div>
+
+    <!-- NEW: Custom Cursor -->
+    <div id="custom-cursor"></div>
+
+    <!-- NEW: Archive Modal -->
+    <div id="archive-modal">
+        <div class="modal-header">
+            <span id="archive-title">ARCHIVE VIEWER</span>
+            <span class="modal-close hover-sfx" onclick="closeArchive()">[ CLOSE ]</span>
+        </div>
+        <div id="archive-body" style="line-height: 1.5;"></div>
     </div>
 
     <!-- 3D Container -->
@@ -279,9 +363,9 @@
             <div class="hero">
                 <h2>DATA<br>ARCHIVES.</h2>
                 <ul class="mining-links">
-                    <li><a href="#" class="hover-sfx">> BLUEPRINTS [EXPUNGED]</a></li>
-                    <li><a href="#" class="hover-sfx">> CREW MANIFEST: RIG 9</a></li>
-                    <li><a href="#" class="hover-sfx">> INCIDENT REPORT #44-B</a></li>
+                    <li><a onclick="openArchive('blueprint')" class="hover-sfx">> BLUEPRINTS [EXPUNGED]</a></li>
+                    <li><a onclick="openArchive('manifest')" class="hover-sfx">> CREW MANIFEST: RIG 9</a></li>
+                    <li><a onclick="openArchive('incident')" class="hover-sfx">> INCIDENT REPORT #44-B</a></li>
                 </ul>
             </div>
         </div>
@@ -379,6 +463,37 @@
         document.querySelectorAll('.hover-sfx').forEach(el => {
             el.addEventListener('click', playClickBeep);
         });
+
+        // --- NEW: Custom Cursor Logic ---
+        const cursor = document.getElementById('custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Add hover effect to interactive elements
+        document.querySelectorAll('a, h1, .modal-close, .hover-sfx').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+        });
+
+        // --- NEW: Archive Data & Logic ---
+        const archives = {
+            'blueprint': "ERROR: DATA CORRUPTED. PARTIAL RECOVERY ACHIEVED.<br><br><span class='glitch-text'>[SCHEMATIC_DRONE_MK4_HEAVY_EXCAVATOR]</span><br><br><b>LOG 2144.09.12 - Chief Engineer Thorne:</b><br>Modifications to the MK4 targeting array were supposed to increase yield by 14%. Instead, the neural-net heuristic loop has destabilized. The drone is no longer recognizing standard recall protocols. Last night, it bypassed the primary airlock safeties and began 'mining' the structural supports of Sector C.<br><br><b>LOG 2144.09.14:</b><br>We tried to remotely sever its power link, but it seems to have fabricated a localized battery bypass using scrap platinum. It's building something down there. Recommend immediate deployment of EMP charges before it breaches the main reactor. <span class='glitch-text'>DO NOT LET IT FINISH.</span>",
+            'manifest': "STATION: DEEP ORBITAL RIG 9<br>STATUS: OFFLINE (NO SIGNAL)<br>LAST KNOWN LOCATION: ASTEROID BELT SECTOR 7G-ALPHA<br><br>CREW MANIFEST:<br>- Cmdr. Vance [STATUS: MIA]<br>- Eng. Tali [STATUS: DECEASED - AIRLOCK MALFUNCTION]<br>- Geologist R. Cole [STATUS: MIA]<br>- Miner Unit 4 [STATUS: ACTIVE - ROGUE]<br>- Miner Unit 5 [STATUS: ACTIVE - ROGUE]<br><br><b>AUTOMATED DISTRESS BEACON - DAY 45:</b><br>Warning. Life support systems operating at 12% capacity. Oxygen reserves critically low. Thermal regulation offline. Ambient temperature -40C.<br><br><b>FINAL TRANSMISSION LOG (Audio Transcript):</b><br><i>[Static]</i> '...not a rock... I am telling you it is a hollow shell... Vance went down the central shaft three days ago. I can still hear him tapping on the pipes. But the tapping... it is coming from outside the hull...' <i>[Transmission Ends]</i>",
+            'incident': "INCIDENT REPORT #44-B (CLASSIFIED LEVEL 5)<br>DATE: 2144.11.05<br>LOCATION: EXCAVATION SITE 'TARTARUS'<br><br><b>SUMMARY:</b><br>During a standard deep core sweep at 400m below surface level, drilling equipment encountered an anomalous, ultra-dense crystalline structure. The material resisted all thermal and kinetic extraction methods. <br><br><b>CASUALTIES:</b><br>Miner First Class J. Aris was struck by a refracted laser pulse bouncing off the crystal. Following the incident, Aris reported severe auditory hallucinations, describing them as 'voices emitting from the mineral lattice, singing in mathematical equations.'<br><br><b>CONTAINMENT PROTOCOL:</b><br>Subject has been quarantined in Medical Bay 4. Over the past 72 hours, the subject has scratched hundreds of complex orbital mechanics equations into the walls using his own fingernails. The equations perfectly predict the movement of every celestial body in the sector. <br><br>Excavation Site Tartarus has been sealed. <span class='glitch-text'>Do not open Sector 4. Do not listen to the lattice.</span>"
+        };
+
+        window.openArchive = function(id) {
+            const modal = document.getElementById('archive-modal');
+            const body = document.getElementById('archive-body');
+            body.innerHTML = archives[id];
+            modal.style.display = 'block';
+        };
+
+        window.closeArchive = function() {
+            document.getElementById('archive-modal').style.display = 'none';
+        };
 
         // Initialize audio on the first click anywhere in the window
         window.addEventListener('pointerdown', initAudio, { once: true });
