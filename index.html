@@ -15,13 +15,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AsteroidWorks.Inc</title>
+    <!-- Added Sci-Fi Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             overflow: hidden;
             background-color: #050505;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Share Tech Mono', 'Courier New', Courier, monospace;
             color: white;
+            user-select: none;
         }
 
         #canvas-container {
@@ -54,7 +57,7 @@
             align-items: center;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 2rem; /* Add spacing for views */
+            margin-bottom: 2rem;
             pointer-events: auto;
         }
 
@@ -108,6 +111,7 @@
             background: rgba(0, 0, 0, 0.5);
             padding: 1rem;
             border-left: 2px solid #0ff;
+            pointer-events: auto;
         }
 
         /* Mining Page Styles */
@@ -116,30 +120,18 @@
             padding: 0;
             margin: 2rem 0;
             pointer-events: auto;
-            max-height: 55vh; /* Restricts height so it doesn't fall off screen */
-            overflow-y: auto; /* Enables vertical scrolling */
-            padding-right: 15px; /* Adds space so the scrollbar doesn't cover text */
+            max-height: 55vh; 
+            overflow-y: auto; 
+            padding-right: 15px; 
         }
 
-        /* Custom Sci-Fi Scrollbar for the links */
-        .mining-links::-webkit-scrollbar {
-            width: 8px;
-        }
-        .mining-links::-webkit-scrollbar-track {
-            background: rgba(0, 255, 255, 0.05);
-            border-radius: 4px;
-        }
-        .mining-links::-webkit-scrollbar-thumb {
-            background: rgba(0, 255, 255, 0.3);
-            border-radius: 4px;
-        }
-        .mining-links::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 255, 255, 0.8);
-        }
+        /* Custom Sci-Fi Scrollbar */
+        .mining-links::-webkit-scrollbar { width: 8px; }
+        .mining-links::-webkit-scrollbar-track { background: rgba(0, 255, 255, 0.05); border-radius: 4px; }
+        .mining-links::-webkit-scrollbar-thumb { background: rgba(0, 255, 255, 0.3); border-radius: 4px; }
+        .mining-links::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 255, 0.8); }
         
-        .mining-links li {
-            margin-bottom: 1rem;
-        }
+        .mining-links li { margin-bottom: 1rem; }
 
         .mining-links a {
             font-size: 1.5rem;
@@ -159,8 +151,6 @@
             border-bottom-color: #0ff;
         }
 
-        /* REMOVED: All Tycoon Game Styles */
-
         .status-bar {
             display: flex;
             gap: 2rem;
@@ -172,9 +162,67 @@
         .status-item span {
             color: #0ff;
         }
+
+        /* BOOT SCREEN STYLES */
+        #boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #050505;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 3rem;
+            box-sizing: border-box;
+            transition: opacity 1s ease-out;
+        }
+
+        #boot-text {
+            color: #0ff;
+            font-size: 1.2rem;
+            white-space: pre-wrap;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+        
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        /* SCANNER PANEL UI */
+        #scan-panel {
+            position: absolute;
+            display: none;
+            background: rgba(0, 20, 30, 0.85);
+            border: 1px solid #0ff;
+            color: #0ff;
+            padding: 1rem;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2), inset 0 0 10px rgba(0, 255, 255, 0.1);
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            transform: translate(20px, -50%); /* Offset from mouse */
+            z-index: 10;
+        }
+        
+        .scan-title {
+            border-bottom: 1px solid rgba(0, 255, 255, 0.5);
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
     </style>
 </head>
 <body>
+
+    <!-- BOOT SEQUENCE OVERLAY -->
+    <div id="boot-screen">
+        <div id="boot-text"></div>
+    </div>
 
     <!-- 3D Container -->
     <div id="canvas-container"></div>
@@ -182,12 +230,12 @@
     <!-- UI Overlay -->
     <div id="ui-layer">
         <header>
-            <h1 onclick="switchView('home-view')">AsteroidWorks.Inc</h1>
+            <h1 onclick="switchView('home-view')" class="hover-sfx">AsteroidWorks.Inc</h1>
             <nav>
-                <a onclick="switchView('mining-view')">Mining</a>
-                <a href="#">Revenue</a>
-                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdJGkSP0lKdVWtbc_66BIyzN4WvCJ8THGFT-JEbB2hsVdmBcQ/viewform?usp=preview" target="_blank">Error Reports</a>
-                <a onclick="switchView('contact-view')">Contact</a>
+                <a onclick="switchView('operations-view')" class="hover-sfx">Operations</a>
+                <a onclick="switchView('disclaimer-view')" class="hover-sfx">Disclaimer</a>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdJGkSP0lKdVWtbc_66BIyzN4WvCJ8THGFT-JEbB2hsVdmBcQ/viewform?usp=preview" target="_blank" class="hover-sfx">Error Reports</a>
+                <a onclick="switchView('archives-view')" class="hover-sfx">Archives</a>
             </nav>
         </header>
 
@@ -195,70 +243,204 @@
         <div id="home-view" class="view-section">
             <div class="hero">
                 <h2>BUILDING<br>THE BELT.</h2>
-                <p>From masive Artifical Intelligences to simple computer games, Asteroid.works the upstart company is contantly creating projects and content.</p>
+                <p>From massive Artificial Intelligences to simple computer games, Asteroid.works the upstart company is constantly creating projects and content.</p>
             </div>
         </div>
 
-        <!-- MINING VIEW (Hidden by default) -->
-        <div id="mining-view" class="view-section" style="display: none;">
+        <!-- OPERATIONS VIEW -->
+        <div id="operations-view" class="view-section" style="display: none;">
             <div class="hero">
-                <h2>MINING<br>OPERATIONS.</h2>
+                <h2>ACTIVE<br>OPERATIONS.</h2>
                 <ul class="mining-links">
-                    <li><a href="https://halleybearyoung-coder.github.io/Bouncy-Asteroid/">> BOUNCY ASTEROID</a></li>
-                    <li><a href="https://halleybearyoung-coder.github.io/Asteroid.Works.AI/">> ASTEROIDS OF AI</a></li>
-                    <li><a href="https://halleybearyoung-coder.github.io/Asteroid_Sweeper/">> ASTEROID SWEEPER</a></li>
-                    <li><a href="https://halleybearyoung-coder.github.io/Space_Maze/">> SPACE MAZE</a></li>
-                    <li><a href="https://halleybearyoung-coder.github.io/Payload/">> MINERAL CALCULATOR</a></li>
-                    <li><a href="https://halleybearyoung-coder.github.io/ASTEROID_CRYPT/">> ASTEROID CIPHER</a></li>
-                    <li><a href="https://halleybearyoung-coder.github.io/ASTEROID.QR/">> ASTEROID QR GEN</a></li>
-                    <li><a href="https://halleybearyoung-coder.github.io/PlayPoker/">> POKER PRO</a></li>
-                    <li><a href="https://halleybearyoung-coder.github.io/Pixelcraft/">> PIXELCRAFT VOXEL ENGINE</a></li>
-                    <li><a href="https://halleybearyoung-coder.github.io/Tug0fwar/">> TUG OF WAR</a></li>
+                    <li><a href="https://halleybearyoung-coder.github.io/Bouncy-Asteroid/" class="hover-sfx">> BOUNCY ASTEROID</a></li>
+                    <li><a href="#" class="hover-sfx">> ASTEROIDS OF AI <span style="color: #ff5555; font-size: 0.7em;">[UNDER REPAIRS]</span></a></li>
+                    <li><a href="#" class="hover-sfx">> ASTEROID SWEEPER <span style="color: #ff5555; font-size: 0.7em;">[UNDER REPAIRS]</span></a></li>
+                    <li><a href="https://halleybearyoung-coder.github.io/Space_Maze/" class="hover-sfx">> SPACE MAZE</a></li>
+                    <li><a href="https://halleybearyoung-coder.github.io/Payload/" class="hover-sfx">> MINERAL CALCULATOR</a></li>
+                    <li><a href="https://halleybearyoung-coder.github.io/ASTEROID_CRYPT/" class="hover-sfx">> ASTEROID CIPHER</a></li>
+                    <li><a href="https://halleybearyoung-coder.github.io/ASTEROID.QR/" class="hover-sfx">> ASTEROID QR GEN</a></li>
+                    <li><a href="https://halleybearyoung-coder.github.io/PlayPoker/" class="hover-sfx">> POKER PRO</a></li>
+                    <li><a href="#" class="hover-sfx">> PIXELCRAFT VOXEL ENGINE <span style="color: #ff5555; font-size: 0.7em;">[BEING REPLACED]</span></a></li>
+                    <li><a href="https://halleybearyoung-coder.github.io/Tug0fwar/" class="hover-sfx">> TUG OF WAR</a></li>
                 </ul>
             </div>
         </div>
 
-        <!-- REMOVED: Tycoon View Section -->
-
-        <!-- CONTACT VIEW (Hidden by default) -->
-        <div id="contact-view" class="view-section" style="display: none;">
+        <!-- DISCLAIMER VIEW -->
+        <div id="disclaimer-view" class="view-section" style="display: none;">
             <div class="hero">
-                <h2>SECURE<br>CHANNELS.</h2>
+                <h2>LEGAL<br>DISCLAIMER.</h2>
+                <p>All technologies, games, and simulations provided by AsteroidWorks.Inc are for demonstrative and entertainment purposes. AsteroidWorks.Inc assumes no liability for gravitational anomalies, localized time dilation, or spontaneous drone sentience. Use at your own risk.</p>
+            </div>
+        </div>
+
+        <!-- ARCHIVES VIEW -->
+        <div id="archives-view" class="view-section" style="display: none;">
+            <div class="hero">
+                <h2>DATA<br>ARCHIVES.</h2>
                 <ul class="mining-links">
-                    <li><a href="#">> CONTACT REMOVED</a></li>
+                    <li><a href="#" class="hover-sfx">> BLUEPRINTS [EXPUNGED]</a></li>
+                    <li><a href="#" class="hover-sfx">> CREW MANIFEST: RIG 9</a></li>
+                    <li><a href="#" class="hover-sfx">> INCIDENT REPORT #44-B</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="status-bar">
-            <div class="status-item">SYSTEM: <span>ONLINE</span></div>
+            <div class="status-item">SYSTEM: <span id="audio-status" class="blink">AWAITING CLICK</span></div>
             <div class="status-item">SECTOR: <span>7G-ALPHA</span></div>
             <div class="status-item">YIELD: <span>98.4%</span></div>
         </div>
     </div>
+    
+    <!-- DYNAMIC SCAN PANEL -->
+    <div id="scan-panel">
+        <div class="scan-title">DEEP CORE SCAN</div>
+        <div id="scan-data"></div>
+    </div>
+
+    <!-- Web Audio API Logic (Synthesized Sounds) -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioInitialized = false;
+
+        function initAudio() {
+            if (audioInitialized) return;
+            audioInitialized = true;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            document.getElementById('audio-status').innerText = "ONLINE";
+            document.getElementById('audio-status').classList.remove('blink');
+
+            // --- 1. Ambient Engine Hum (Low Frequency Oscillators) ---
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc1.type = 'sine';
+            osc1.frequency.value = 45; // Deep rumble
+            osc2.type = 'triangle';
+            osc2.frequency.value = 52; // Slightly offset for a beating, mechanical effect
+
+            gainNode.gain.value = 0.06; // Increased volume back up for better immersion
+
+            osc1.connect(gainNode);
+            osc2.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            osc1.start();
+            osc2.start();
+        }
+
+        // --- 2. High-Tech UI Click Beep ---
+        function playClickBeep() {
+            if (!audioInitialized || audioCtx.state === 'suspended') return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'sine'; // Smoother, premium sound (removed harsh square wave)
+            
+            // Short, pleasant high-tech chirp
+            osc.frequency.setValueAtTime(1800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
+            
+            // Envelope (Snappy click)
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // --- 3. Scan Ping Sound ---
+        function playScanPing() {
+            if (!audioInitialized || audioCtx.state === 'suspended') return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            // Start high, drop down quickly (pew sound)
+            osc.frequency.setValueAtTime(2000, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.2);
+            
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        // Attach click sounds to links (changed from hover)
+        document.querySelectorAll('.hover-sfx').forEach(el => {
+            el.addEventListener('click', playClickBeep);
+        });
+
+        // Initialize audio on the first click anywhere in the window
+        window.addEventListener('pointerdown', initAudio, { once: true });
+    </script>
+
+    <!-- Boot Sequence Logic -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const bootScreen = document.getElementById('boot-screen');
+            const bootText = document.getElementById('boot-text');
+            
+            const bootSequence = [
+                "ASTERIX OS v9.4.2 [SECURE CONNECTION]",
+                "INITIALIZING COMMS LINK...... [OK]",
+                "CALIBRATING SENSORS.......... [OK]",
+                "ESTABLISHING ORBITAL LOCK.... [OK]",
+                "VERIFYING CREW MANIFEST...... [OK]",
+                "SYSTEM READY.",
+                "",
+                "<span class='blink'>CLICK ANYWHERE TO ENGAGE TERMINAL</span>"
+            ];
+
+            let currentDelay = 500; 
+
+            // Type out everything except the final prompt
+            for(let i=0; i<bootSequence.length - 1; i++) {
+                setTimeout(() => { bootText.innerHTML += bootSequence[i] + "<br>"; }, currentDelay);
+                currentDelay += 300 + Math.random() * 400; 
+            }
+
+            // Show final prompt
+            setTimeout(() => {
+                bootText.innerHTML += bootSequence[bootSequence.length - 1];
+                
+                // Wait for user click to close boot screen
+                window.addEventListener('pointerdown', () => {
+                    bootScreen.style.opacity = '0';
+                    setTimeout(() => { bootScreen.style.display = 'none'; }, 1000); 
+                }, { once: true });
+
+            }, currentDelay + 200);
+        });
+    </script>
 
     <!-- Three.js Logic -->
     <script type="module">
         import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
-        // REMOVED: All Game State and Game Logic functions
-
         // --- Navigation Logic ---
         window.switchView = function(viewId) {
-            // Hide all view sections
             document.querySelectorAll('.view-section').forEach(el => {
                 el.style.display = 'none';
             });
-            // Show the selected one
             const target = document.getElementById(viewId);
             if(target) {
-                target.style.display = 'flex'; // Restore flex display
+                target.style.display = 'flex'; 
             }
+            // Removed redundant sound call from here since it's now bound to the click event above
         };
 
         // 1. Scene Setup
         const scene = new THREE.Scene();
-        // Add subtle fog for depth
         scene.fog = new THREE.FogExp2(0x050505, 0.002);
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -270,14 +452,12 @@
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
         // 2. Lighting
-        const ambientLight = new THREE.AmbientLight(0x404040, 2); // Soft white light
-        scene.add(ambientLight);
-
-        const pointLight = new THREE.PointLight(0x00ffff, 2, 50); // Cyan mining light
+        const hemiLight = new THREE.HemisphereLight(0x001133, 0x111111, 2.5);
+        scene.add(hemiLight);
+        const pointLight = new THREE.PointLight(0x00ffff, 3, 50); 
         pointLight.position.set(5, 5, 5);
         scene.add(pointLight);
-
-        const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        const sunLight = new THREE.DirectionalLight(0xffeedd, 2.0); 
         sunLight.position.set(-5, 3, 5);
         scene.add(sunLight);
 
@@ -289,11 +469,9 @@
             canvas.height = size;
             const ctx = canvas.getContext('2d');
 
-            // 1. Base Noise
-            ctx.fillStyle = '#555'; // Base grey
+            ctx.fillStyle = '#555';
             ctx.fillRect(0, 0, size, size);
 
-            // 2. Grainy Noise (Sand/Dust)
             for (let i = 0; i < 100000; i++) {
                 const x = Math.random() * size;
                 const y = Math.random() * size;
@@ -303,7 +481,6 @@
                 ctx.fillRect(x, y, 2, 2);
             }
             
-            // 3. Larger Splotches (Mineral deposits)
             for (let i = 0; i < 200; i++) {
                 const x = Math.random() * size;
                 const y = Math.random() * size;
@@ -315,87 +492,54 @@
                 ctx.fill();
             }
 
-            const texture = new THREE.CanvasTexture(canvas);
-            return texture;
+            return new THREE.CanvasTexture(canvas);
         }
 
         const rockTexture = createRockTexture();
 
-
-        // 3. The Asteroid (Procedural)
-        // Switched to high-res SphereGeometry (256 segments) for maximum smoothness
+        // 3. The Asteroid
         const geometry = new THREE.SphereGeometry(2, 256, 256); 
-        
         const positionAttribute = geometry.attributes.position;
         const vertex = new THREE.Vector3();
-        
-        // Define random impact craters
         const craters = [];
         
-        // 1. Large "Hero" Craters
         for(let k = 0; k < 5; k++) {
-            const center = new THREE.Vector3(
-                (Math.random() - 0.5) * 2, 
-                (Math.random() - 0.5) * 2, 
-                (Math.random() - 0.5) * 2
-            ).normalize();
             craters.push({
-                center: center,
+                center: new THREE.Vector3((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2).normalize(),
                 radius: 0.3 + Math.random() * 0.2, 
                 depth: 0.1 + Math.random() * 0.1,
-                hasRim: Math.random() > 0.5 // 50% chance of a rim
+                hasRim: Math.random() > 0.5 
             });
         }
-
-        // 2. Small "Micro" Craters (The requested bunch)
         for(let k = 0; k < 80; k++) {
-            const center = new THREE.Vector3(
-                (Math.random() - 0.5) * 2, 
-                (Math.random() - 0.5) * 2, 
-                (Math.random() - 0.5) * 2
-            ).normalize();
             craters.push({
-                center: center,
-                radius: 0.05 + Math.random() * 0.1, // Small but spans enough vertices
-                depth: 0.02 + Math.random() * 0.03,  // Visible indent
-                hasRim: Math.random() > 0.7 // 30% chance of a rim
+                center: new THREE.Vector3((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2).normalize(),
+                radius: 0.05 + Math.random() * 0.1,
+                depth: 0.02 + Math.random() * 0.03, 
+                hasRim: Math.random() > 0.7 
             });
         }
 
         for (let i = 0; i < positionAttribute.count; i++) {
             vertex.fromBufferAttribute(positionAttribute, i);
-            
             const v = vertex.clone().normalize();
             
-            // 1. Shape Noise (Low Frequency)
             let distortion = 0;
             distortion += Math.sin(v.x * 2.1 + 0.5) * 0.5; 
             distortion += Math.cos(v.y * 1.8 + 1.2) * 0.5;
             distortion += Math.sin(v.z * 2.5 + 2.0) * 0.5;
 
-            // 2. Surface Noise (High Frequency)
-            // Lowered frequency and amplitude to remove "jagged" look
             distortion += Math.sin(v.x * 4) * 0.03;
             distortion += Math.cos(v.y * 4) * 0.03;
             distortion += Math.sin(v.z * 4) * 0.03;
 
-            // 3. Apply Craters
             for (let k = 0; k < craters.length; k++) {
                 const crater = craters[k];
-                const dist = v.distanceTo(crater.center); // Distance on sphere surface
-
+                const dist = v.distanceTo(crater.center);
                 if (dist < crater.radius) {
-                    // Normalized distance from center (0 to 1)
                     const x = dist / crater.radius;
-                    
-                    // Create a smooth bowl shape using Cosine
-                    // At center (x=0), val=1. At edge (x=1), val=0.
                     const cavity = Math.pow(Math.cos(x * Math.PI * 0.5), 2.5); 
-                    
-                    // Dig the hole
                     distortion -= cavity * crater.depth * 3.5;
-
-                    // Conditional Rim: Only add the "lump" if this crater has one
                     if (crater.hasRim) {
                         const rim = Math.sin(x * Math.PI) * crater.depth * 2.0;
                         if (rim > 0) distortion += rim;
@@ -403,23 +547,20 @@
                 }
             }
             
-            // Apply distortion to radius
             const radius = 2.0 + distortion * 0.6;
-            
             vertex.normalize().multiplyScalar(radius);
-            
             positionAttribute.setXYZ(i, vertex.x, vertex.y, vertex.z);
         }
         
         geometry.computeVertexNormals();
 
         const material = new THREE.MeshStandardMaterial({
-            color: 0x888888,     // Lighter base to let texture show
-            map: rockTexture,    // Apply the texture
-            bumpMap: rockTexture,// Use texture for bumpiness
-            bumpScale: 0.15,     // Strength of the surface grit
-            roughness: 0.9,
-            metalness: 0.2,
+            color: 0x777777,
+            map: rockTexture,
+            bumpMap: rockTexture,
+            bumpScale: 0.25,
+            roughness: 0.8,
+            metalness: 0.35,
             flatShading: false
         });
 
@@ -430,28 +571,22 @@
         const starsGeometry = new THREE.BufferGeometry();
         const starsCount = 2000;
         const posArray = new Float32Array(starsCount * 3);
-
         for(let i = 0; i < starsCount * 3; i++) {
-            // Spread stars far out
             posArray[i] = (Math.random() - 0.5) * 50; 
         }
-
         starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const starsMaterial = new THREE.PointsMaterial({
-            size: 0.02,
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.8
-        });
+        const starsMaterial = new THREE.PointsMaterial({ size: 0.02, color: 0xffffff, transparent: true, opacity: 0.8 });
         const starMesh = new THREE.Points(starsGeometry, starsMaterial);
         scene.add(starMesh);
 
-        // 5. Interaction variables
+        // 5. Interaction variables & Raycaster
         let mouseX = 0;
         let mouseY = 0;
         let targetX = 0;
         let targetY = 0;
-        // REMOVED: Raycaster Logic
+        
+        const raycaster = new THREE.Raycaster();
+        const mouseVector = new THREE.Vector2();
 
         const windowHalfX = window.innerWidth / 2;
         const windowHalfY = window.innerHeight / 2;
@@ -459,6 +594,57 @@
         document.addEventListener('mousemove', (event) => {
             mouseX = (event.clientX - windowHalfX);
             mouseY = (event.clientY - windowHalfY);
+        });
+
+        // --- SCANNING LOGIC ---
+        const scanRings = []; // Array to hold visual ring effects
+        const scanPanel = document.getElementById('scan-panel');
+        const scanData = document.getElementById('scan-data');
+        const scanMasses = ["4.2M TONS", "8.9M TONS", "1.1M TONS", "12.4M TONS", "600K TONS"];
+        const scanComps = ["82% FE, 18% UNK", "90% PT, 10% NI", "45% H2O, 55% SI", "99% CARBON", "UNKNOWN ALLOY"];
+
+        document.addEventListener('pointerdown', (event) => {
+            // Prevent scanning if clicking on UI elements
+            if(event.target.tagName === 'A' || event.target.tagName === 'H1') return;
+
+            mouseVector.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseVector.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouseVector, camera);
+            const intersects = raycaster.intersectObject(asteroid);
+
+            if (intersects.length > 0) {
+                // We clicked the asteroid!
+                playScanPing(); // Play sound effect
+
+                // Show data panel
+                scanPanel.style.display = 'block';
+                scanPanel.style.left = (event.clientX + 15) + 'px';
+                scanPanel.style.top = (event.clientY - 15) + 'px';
+                
+                // Randomize fake data
+                scanData.innerHTML = `
+                    MASS: ${scanMasses[Math.floor(Math.random() * scanMasses.length)]}<br>
+                    COMP: ${scanComps[Math.floor(Math.random() * scanComps.length)]}<br>
+                    TEMP: -${Math.floor(Math.random() * 200)}°C<br>
+                    STATUS: STABLE
+                `;
+
+                // Add 3D visual ring
+                const ringGeo = new THREE.RingGeometry(0.05, 0.1, 32);
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 1, side: THREE.DoubleSide });
+                const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+                
+                // Position at intersection, point outward
+                ringMesh.position.copy(intersects[0].point);
+                ringMesh.lookAt(ringMesh.position.clone().multiplyScalar(2)); // Face outward from center
+                
+                scene.add(ringMesh);
+                scanRings.push(ringMesh);
+            } else {
+                // Clicked empty space, hide panel
+                scanPanel.style.display = 'none';
+            }
         });
 
         // 6. Animation Loop
@@ -475,14 +661,23 @@
             // Parallax mouse effect
             targetX = mouseX * 0.001;
             targetY = mouseY * 0.001;
-
             asteroid.rotation.y += 0.05 * (targetX - asteroid.rotation.y);
             asteroid.rotation.x += 0.05 * (targetY - asteroid.rotation.x);
+
+            // Animate scanning rings
+            for(let i = scanRings.length - 1; i >= 0; i--) {
+                const ring = scanRings[i];
+                ring.scale.addScalar(0.05); // Expand
+                ring.material.opacity -= 0.02; // Fade out
+                if (ring.material.opacity <= 0) {
+                    scene.remove(ring);
+                    scanRings.splice(i, 1);
+                }
+            }
 
             renderer.render(scene, camera);
         }
 
-        // Handle Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
