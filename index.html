@@ -3,7 +3,8 @@
 <head>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2703284471089646"
      crossorigin="anonymous"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TE2KNJYCZX"></script>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TE2KNJYCZX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -14,6 +15,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AsteroidWorks.Inc</title>
+    <!-- Favicon (Tab Icon) -->
+    <link rel="icon" type="image/png" href="AsteroidWorksLogo.png">
+    <!-- Added Sci-Fi Font -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         body {
@@ -59,41 +63,13 @@
             pointer-events: auto;
         }
 
-        /* --- NEW: LOGO STYLES --- */
-        .logo-container {
-            display: flex;
-            align-items: center;
-            cursor: pointer; /* Ensure clicks are captured */
-        }
-
-        #site-logo {
-            height: 2.5rem; /* Adjust height to match text */
-            margin-right: 1rem;
-            /* Added glowing filter to match text and overall sci-fi glow */
-            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
-            transition: filter 0.3s, transform 0.3s;
-        }
-
-        .logo-text {
+        h1 {
             font-size: 1.5rem;
             margin: 0;
             font-weight: bold;
-            color: white;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5));
-            transition: text-shadow 0.3s;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            cursor: pointer;
         }
-
-        /* Hover effect applied by JavaScript, but adding interaction to the logo image on container hover */
-        .logo-container.hovering #site-logo {
-            filter: drop-shadow(0 0 15px #0ff) brightness(1.2);
-            transform: scale(1.05);
-        }
-
-        /* Restored specific text glow rules on the text elements */
-        .logo-container.hovering .logo-text {
-            text-shadow: 0 0 15px #0ff;
-        }
-        /* --- END LOGO STYLES --- */
 
         nav a {
             color: rgba(255, 255, 255, 0.7);
@@ -242,9 +218,8 @@
             letter-spacing: 2px;
         }
 
-        /* --- MODIFIED: CUSTOM CURSOR --- */
-        /* Added new logo container element to the 'none' cursor rule */
-        body, a, h1, .modal-close, .logo-container { cursor: none; }
+        /* --- NEW: CUSTOM CURSOR --- */
+        body, a, h1, .modal-close { cursor: none; }
         
         #custom-cursor {
             position: fixed;
@@ -318,12 +293,15 @@
 </head>
 <body>
 
+    <!-- BOOT SEQUENCE OVERLAY -->
     <div id="boot-screen">
         <div id="boot-text"></div>
     </div>
 
+    <!-- NEW: Custom Cursor -->
     <div id="custom-cursor"></div>
 
+    <!-- NEW: Archive Modal -->
     <div id="archive-modal">
         <div class="modal-header">
             <span id="archive-title">ARCHIVE VIEWER</span>
@@ -332,14 +310,13 @@
         <div id="archive-body" style="line-height: 1.5;"></div>
     </div>
 
+    <!-- 3D Container -->
     <div id="canvas-container"></div>
 
+    <!-- UI Overlay -->
     <div id="ui-layer">
         <header>
-            <div class="logo-container hover-sfx" onclick="switchView('home-view')">
-                <img src="AsteroidWorksLogo.png" alt="AsteroidWorks Logo" id="site-logo">
-                <h1 class="logo-text">AsteroidWorks.Inc</h1>
-            </div>
+            <h1 onclick="switchView('home-view')" class="hover-sfx">AsteroidWorks.Inc</h1>
             <nav>
                 <a onclick="switchView('operations-view')" class="hover-sfx">Operations</a>
                 <a onclick="switchView('disclaimer-view')" class="hover-sfx">Disclaimer</a>
@@ -348,6 +325,7 @@
             </nav>
         </header>
 
+        <!-- HOME VIEW -->
         <div id="home-view" class="view-section">
             <div class="hero">
                 <h2>BUILDING<br>THE BELT.</h2>
@@ -355,11 +333,12 @@
             </div>
         </div>
 
+        <!-- OPERATIONS VIEW -->
         <div id="operations-view" class="view-section" style="display: none;">
             <div class="hero">
                 <h2>ACTIVE<br>OPERATIONS.</h2>
                 <ul class="mining-links">
-                    <li><a href="https://halleybearyoung-coder.github.io/NeonVoid" class="hover-sfx">> NEON VOID <span style="color: #9d00ff; font-size: 0.7em;">[NEW]</span></a></li>
+                    <li><a href="https://halleybearyoung-coder.github.io/NeonVoid" class="hover-sfx">> NEON VOID <span style="color: #90d5ff; font-size: 0.7em;">[NEW]</span></a></li>
                     <li><a href="https://halleybearyoung-coder.github.io/Bouncy-Asteroid/" class="hover-sfx">> BOUNCY ASTEROID</a></li>
                     <li><a href="#" class="hover-sfx">> ASTEROIDS OF AI <span style="color: #ff5555; font-size: 0.7em;">[UNDER REPAIRS]</span></a></li>
                     <li><a href="#" class="hover-sfx">> ASTEROID SWEEPER <span style="color: #ff5555; font-size: 0.7em;">[UNDER REPAIRS]</span></a></li>
@@ -374,6 +353,7 @@
             </div>
         </div>
 
+        <!-- DISCLAIMER VIEW -->
         <div id="disclaimer-view" class="view-section" style="display: none;">
             <div class="hero">
                 <h2>LEGAL<br>DISCLAIMER.</h2>
@@ -381,6 +361,7 @@
             </div>
         </div>
 
+        <!-- ARCHIVES VIEW -->
         <div id="archives-view" class="view-section" style="display: none;">
             <div class="hero">
                 <h2>DATA<br>ARCHIVES.</h2>
@@ -399,11 +380,13 @@
         </div>
     </div>
     
+    <!-- DYNAMIC SCAN PANEL -->
     <div id="scan-panel">
         <div class="scan-title">DEEP CORE SCAN</div>
         <div id="scan-data"></div>
     </div>
 
+    <!-- Web Audio API Logic (Synthesized Sounds) -->
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let audioInitialized = false;
@@ -484,15 +467,15 @@
             el.addEventListener('click', playClickBeep);
         });
 
-        // --- MODIFIED: Custom Cursor Logic ---
+        // --- NEW: Custom Cursor Logic ---
         const cursor = document.getElementById('custom-cursor');
         document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
         });
 
-        // Add hover effect to interactive elements - Updated to include .logo-container
-        document.querySelectorAll('a, h1, .modal-close, .hover-sfx, .logo-container').forEach(el => {
+        // Add hover effect to interactive elements
+        document.querySelectorAll('a, h1, .modal-close, .hover-sfx').forEach(el => {
             el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
             el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
         });
@@ -519,6 +502,7 @@
         window.addEventListener('pointerdown', initAudio, { once: true });
     </script>
 
+    <!-- Boot Sequence Logic -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const bootScreen = document.getElementById('boot-screen');
@@ -557,6 +541,7 @@
         });
     </script>
 
+    <!-- Three.js Logic -->
     <script type="module">
         import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
@@ -737,8 +722,8 @@
         const scanComps = ["82% FE, 18% UNK", "90% PT, 10% NI", "45% H2O, 55% SI", "99% CARBON", "UNKNOWN ALLOY"];
 
         document.addEventListener('pointerdown', (event) => {
-            // Prevent scanning if clicking on UI elements - Updated to include logo container children
-            if(event.target.tagName === 'A' || event.target.closest('.logo-container')) return;
+            // Prevent scanning if clicking on UI elements
+            if(event.target.tagName === 'A' || event.target.tagName === 'H1') return;
 
             mouseVector.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouseVector.y = -(event.clientY / window.innerHeight) * 2 + 1;
